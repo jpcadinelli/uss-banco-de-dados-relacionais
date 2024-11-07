@@ -111,7 +111,7 @@ INSERT INTO veiculo (placa, modelo_codMod, cliente_cpf, cor) VALUES
 ('EFG2345', 11, 11101101100, 'Vermelho'),
 ('HIJ6789', 12, 11201201200, 'Preto'),
 ('KLM0123', 13, 11301301300, 'Branco'),
-('NOP4567', 14, 11401401400, 'Prata'),
+('ABC1D34', 14, 11401401400, 'Prata'),
 ('QRS8901', 15, 11501501500, 'Verde'),
 ('TUV2345', 16, 11601601600, 'Cinza'),
 ('WXY6789', 17, 11701701700, 'Amarelo'),
@@ -157,10 +157,99 @@ INSERT INTO estaciona (cod, patio_num, veiculo_placa, dtEntrada, dtSaida, hrEntr
 (11, 11, 'EFG2345', '2023-10-20', '2023-10-20', '09:30', '11:30'),
 (12, 12, 'HIJ6789', '2023-10-21', '2023-10-21', '10:00', '12:00'),
 (13, 13, 'KLM0123', '2023-10-22', '2023-10-22', '11:00', '13:00'),
-(14, 14, 'NOP4567', '2023-10-23', '2023-10-23', '12:30', '14:30'),
+(14, 14, 'ABC1D34', '2023-10-23', '2023-10-23', '12:30', '14:30'),
 (15, 15, 'QRS8901', '2023-10-24', '2023-10-24', '13:00', '15:00'),
 (16, 16, 'TUV2345', '2023-10-25', '2023-10-25', '14:00', '16:00'),
 (17, 17, 'WXY6789', '2023-10-26', '2023-10-26', '15:30', '17:30'),
 (18, 18, 'ZAB0123', '2023-10-27', '2023-10-27', '08:00', '10:00'),
 (19, 19, 'CDE4567', '2023-10-28', '2023-10-28', '09:00', '11:00'),
 (20, 20, 'FGH8901', '2023-10-29', '2023-10-29', '10:30', '12:30');
+
+# Consultas SQL:
+-- a) Exiba a placa e o nome dos donos de todos os veículos.
+SELECT veiculo.placa, cliente.nome
+FROM veiculo
+JOIN cliente ON veiculo.cliente_cpf = cliente.cpf;
+
+-- b) Exiba o CPF e o nome do cliente que possui o veiculo de placa “ABC1D34”.
+SELECT cliente.cpf, cliente.nome
+FROM cliente
+JOIN veiculo ON cliente.cpf = veiculo.cliente_cpf
+WHERE veiculo.placa = 'ABC1D34';
+
+-- c) Exiba a placa e a cor do veículo que possui o código de estacionamento 1.
+SELECT veiculo.placa, veiculo.cor
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+WHERE estaciona.cod = 1;
+
+-- d) Exiba a placa e o ano do veículo que possui o código de estacionamento 1.
+SELECT veiculo.placa, veiculo.ano
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+WHERE estaciona.cod = 1; # Se veículo tivesse ano acredito que seria desta forma
+
+-- e) Exiba a placa, o ano do veículo e a descrição de seu modelo, se ele possuir ano a partir de 2000.
+SELECT veiculo.placa, veiculo.ano, modelo.desc_2 AS descricao_modelo
+FROM veiculo
+JOIN modelo ON veiculo.modelo_codMod = modelo.codMod
+WHERE veiculo.ano >= 2000; # Se veículo tivesse ano acredito que seria desta forma
+
+-- f) Exiba o endereço, a data de entrada e de saída dos estacionamentos do veículo de placa “JEG-1010”.
+SELECT patio.ender, estaciona.dtEntrada, estaciona.dtSaida
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+JOIN patio ON estaciona.patio_num = patio.num
+WHERE veiculo.placa = 'JEG-1010';
+
+-- g) Exiba a quantidade de vezes que os veículos de cor verde estacionaram.
+SELECT COUNT(*) AS quantidade_veiculos_verde
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+WHERE veiculo.cor = 'verde';
+
+-- h) Liste todos os clientes que possuem carro de modelo 1.
+SELECT cliente.cpf, cliente.nome
+FROM cliente
+JOIN veiculo ON cliente.cpf = veiculo.cliente_cpf
+WHERE veiculo.modelo_codMod = 1;
+
+-- i) Liste as placas, os horários de entrada e saída dos veículos de cor verde.
+SELECT veiculo.placa, estaciona.hrEntrada, estaciona.hrSaida
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+WHERE veiculo.cor = 'verde';
+
+-- j) Liste todos os estacionamentos do veículo de placa “ABC1D34”.
+SELECT patio.ender, estaciona.dtEntrada, estaciona.dtSaida
+FROM estaciona
+JOIN veiculo ON estaciona.veiculo_placa = veiculo.placa
+JOIN patio ON estaciona.patio_num = patio.num
+WHERE veiculo.placa = 'ABC1D34';
+
+-- k) Exiba o nome do cliente que possui o veículo cujo código do estacionamento é 2.
+SELECT cliente.nome
+FROM cliente
+JOIN veiculo ON cliente.cpf = veiculo.cliente_cpf
+JOIN estaciona ON veiculo.placa = estaciona.veiculo_placa
+WHERE estaciona.cod = 2;
+
+-- l) Exiba o CPF do cliente que possui o veículo cujo código do estacionamento é 3.
+SELECT cliente.cpf
+FROM cliente
+JOIN veiculo ON cliente.cpf = veiculo.cliente_cpf
+JOIN estaciona ON veiculo.placa = estaciona.veiculo_placa
+WHERE estaciona.cod = 3;
+
+-- m) Exiba a descrição do modelo do veículo cujo código do estacionamento é 2.
+SELECT modelo.desc_2
+FROM modelo
+JOIN veiculo ON modelo.codMod = veiculo.modelo_codMod
+JOIN estaciona ON veiculo.placa = estaciona.veiculo_placa
+WHERE estaciona.cod = 2;
+
+-- n) Exiba a placa, o nome dos donos e a descrição dos modelos de todos os veículos.
+SELECT veiculo.placa, cliente.nome, modelo.desc_2
+FROM veiculo
+JOIN cliente ON veiculo.cliente_cpf = cliente.cpf
+JOIN modelo ON veiculo.modelo_codMod = modelo.codMod;
