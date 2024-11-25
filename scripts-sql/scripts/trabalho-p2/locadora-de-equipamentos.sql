@@ -378,3 +378,81 @@ INSERT INTO manutencao (id, id_equipamento, id_empresa, descricao, data_inicio, 
 (3, 10, 5, 'Atualização de firmware.', '2023-03-01', '2023-03-05', 2000.00),
 (4, 2, 1, 'Troca de cabos hidráulicos.', '2023-04-12', '2023-04-18', 4500.00),
 (5, 8, 4, 'Revisão do sistema de freios.', '2023-05-01', '2023-05-07', 3500.00);
+
+# Consultas
+# 1)
+SELECT
+    e.nome AS equipamento_nome,
+    e.marca,
+    e.modelo,
+    l.data_inicio,
+    l.data_fim,
+    e.status AS equipamento_status,
+    c.nome AS categoria_nome
+    FROM locacao_equipamento le
+    JOIN equipamento e ON le.id_equipamento = e.id
+    JOIN locacao l ON le.id_locacao = l.id
+    JOIN categoria c ON e.id_categoria = c.id
+    WHERE e.status = 'Locado';
+
+# 2)
+SELECT
+    f.nome AS funcionario_nome,
+    f.cargo,
+    s.nome AS servico_nome,
+    s.descricao AS servico_descricao,
+    s.custo
+    FROM locacao_funcionario lf
+    JOIN funcionario f ON lf.id_funcionario = f.id
+    JOIN locacao_equipamento le ON lf.id_locacao = le.id_locacao
+    JOIN servico_adicional s ON le.id_locacao = s.id_locacao
+    WHERE lf.id_locacao = 1;
+
+# 3)
+SELECT
+    l.id AS locacao_id,
+    SUM(s.custo) AS custo_total
+    FROM locacao_equipamento le
+    JOIN equipamento e ON le.id_equipamento = e.id
+    JOIN servico_adicional s ON le.id_locacao = s.id_locacao
+    JOIN locacao l ON le.id_locacao = l.id
+    WHERE l.id = 2;
+
+# 4)
+SELECT
+    e.nome AS equipamento_nome,
+    e.marca,
+    e.modelo,
+    m.descricao AS manutencao_descricao,
+    m.data_inicio,
+    m.data_fim,
+    emp.nome AS empresa_nome
+    FROM manutencao m
+    JOIN equipamento e ON m.id_equipamento = e.id
+    JOIN empresa emp ON m.id_empresa = emp.id
+    WHERE m.data_inicio >= '2023-03-01';
+
+# 5)
+SELECT
+    e.nome AS equipamento_nome,
+    e.marca,
+    e.modelo,
+    e.status AS equipamento_status,
+    l.data_inicio AS locacao_inicio,
+    l.data_fim AS locacao_fim,
+    m.data_inicio AS manutencao_inicio,
+    m.data_fim AS manutencao_fim
+    FROM equipamento e
+    LEFT JOIN locacao_equipamento le ON e.id = le.id_equipamento
+    LEFT JOIN locacao l ON le.id_locacao = l.id
+    LEFT JOIN manutencao m ON e.id = m.id_equipamento
+    JOIN categoria c ON e.id_categoria = c.id
+    WHERE c.nome = 'Construção Civil'
+            AND (e.status IN ('Locado', 'Em Manutenção')
+                OR m.data_inicio IS NOT NULL);
+
+# 6)
+SELECT SUM(f.valor_total) AS Faturamento_Semestral
+    FROM fatura f
+    WHERE status = 'Concluída'
+        AND data_emissao >= CURDATE() - INTERVAL 6 MONTH;
